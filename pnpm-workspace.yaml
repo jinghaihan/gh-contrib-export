@@ -1,0 +1,40 @@
+catalogMode: prefer
+
+shellEmulator: true
+
+trustPolicy: no-downgrade
+
+packages: []
+catalogs:
+  build:
+    tsdown: ^0.18.4
+  cli:
+    bumpp: ^10.3.2
+    pncat: ^0.7.7
+    taze: ^19.9.2
+  lint:
+    '@antfu/eslint-config': ^6.7.3
+    eslint: ^9.39.2
+    lint-staged: ^16.2.7
+    simple-git-hooks: ^2.13.1
+  node:
+    '@clack/prompts': ^0.11.0
+    ansis: ^4.2.0
+    cac: ^6.7.14
+    execa: ^9.6.1
+    pathe: ^2.0.3
+  prod:
+    '@octokit/core': ^7.0.6
+  script:
+    tsx: ^4.21.0
+  test:
+    vitest: ^4.0.16
+  tsc:
+    typescript: ^5.9.3
+  types:
+    '@types/node': ^25.0.3
+  utils:
+    p-retry: ^7.1.1
+onlyBuiltDependencies:
+  - esbuild
+  - simple-git-hooks

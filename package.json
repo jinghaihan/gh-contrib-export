@@ -1,0 +1,81 @@
+{
+  "name": "gh-contrib-export",
+  "type": "module",
+  "version": "0.0.0-alpha.0",
+  "packageManager": "pnpm@10.27.0",
+  "description": "A CLI to export GitHub contributions and publish to a GitHub Gist.",
+  "author": "jinghaihan",
+  "license": "MIT",
+  "homepage": "https://github.com/jinghaihan/gh-contrib-export#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinghaihan/gh-contrib-export.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jinghaihan/gh-contrib-export/issues"
+  },
+  "keywords": [
+    "github",
+    "contributions",
+    "pull-requests",
+    "export",
+    "json",
+    "gist"
+  ],
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./cli": "./dist/cli.mjs",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "bin": {
+    "gh-contrib-export": "./bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "start": "tsx ./src/cli.ts",
+    "build": "tsdown",
+    "deps": "taze major -I",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "release": "bumpp",
+    "bootstrap": "pnpm install",
+    "prepare": "simple-git-hooks",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@clack/prompts": "catalog:node",
+    "@octokit/core": "catalog:prod",
+    "ansis": "catalog:node",
+    "cac": "catalog:node",
+    "execa": "catalog:node",
+    "p-retry": "catalog:utils",
+    "pathe": "catalog:node"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "catalog:lint",
+    "@types/node": "catalog:types",
+    "bumpp": "catalog:cli",
+    "eslint": "catalog:lint",
+    "lint-staged": "catalog:lint",
+    "pncat": "catalog:cli",
+    "simple-git-hooks": "catalog:lint",
+    "taze": "catalog:cli",
+    "tsdown": "catalog:build",
+    "tsx": "catalog:script",
+    "typescript": "catalog:tsc",
+    "vitest": "catalog:test"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  }
+}
