@@ -1,25 +1,27 @@
 {
-  "name": "gh-contrib-export",
+  "name": "gh-statskit",
   "type": "module",
   "version": "0.0.0-alpha.0",
   "packageManager": "pnpm@10.27.0",
-  "description": "A CLI to export GitHub contributions and publish to a GitHub Gist.",
+  "description": "A CLI to export GitHub stats and publish to a GitHub Gist.",
   "author": "jinghaihan",
   "license": "MIT",
-  "homepage": "https://github.com/jinghaihan/gh-contrib-export#readme",
+  "homepage": "https://github.com/jinghaihan/gh-statskit#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jinghaihan/gh-contrib-export.git"
+    "url": "git+https://github.com/jinghaihan/gh-statskit.git"
   },
   "bugs": {
-    "url": "https://github.com/jinghaihan/gh-contrib-export/issues"
+    "url": "https://github.com/jinghaihan/gh-statskit/issues"
   },
   "keywords": [
     "github",
-    "contributions",
+    "stats",
+    "stars",
+    "commits",
     "pull-requests",
-    "export",
-    "json",
+    "issues",
+    "contributions",
     "gist"
   ],
   "exports": {
@@ -31,7 +33,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "bin": {
-    "gh-contrib-export": "./bin/cli.mjs"
+    "gh-statskit": "./bin/cli.mjs"
   },
   "files": [
     "bin",

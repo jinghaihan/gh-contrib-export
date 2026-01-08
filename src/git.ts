@@ -1,4 +1,11 @@
-import type { GraphQLStatsResponse, GraphQLUser, Options, PullRequest, Stats, User } from './types'
+import type {
+  GitHubStats,
+  GraphQLStatsResponse,
+  GraphQLUser,
+  Options,
+  PullRequest,
+  User,
+} from './types'
 import { execa } from 'execa'
 import pRetry from 'p-retry'
 import { GRAPHQL_STATS_QUERY } from './constants'
@@ -8,7 +15,8 @@ const RepoCache = new Map()
 
 export async function readTokenFromGitHubCli() {
   try {
-    return await execa('gh', ['auth', 'token'])
+    const { stdout } = await execa('gh', ['auth', 'token'])
+    return stdout.trim()
   }
   catch {
     return ''
@@ -92,9 +100,9 @@ export async function getGraphQLStats(user: User, options: Options): Promise<Gra
   const variables = {
     login: user.username,
     after: null,
-    includeMergedPullRequests: options.mergedPullRequests,
-    includeDiscussions: options.discussions,
-    includeDiscussionsAnswers: options.discussionsAnswers,
+    includeMergedPullRequests: true,
+    includeDiscussions: true,
+    includeDiscussionsAnswers: true,
   }
 
   const response = await pRetry(
@@ -107,7 +115,7 @@ export async function getGraphQLStats(user: User, options: Options): Promise<Gra
   return graphqlUser
 }
 
-export async function updateGist(data: Stats, gistId: string, token: string): Promise<string> {
+export async function updateGist(data: GitHubStats, gistId: string, token: string): Promise<string> {
   const octokit = getOctoKit(token)
   const existingGist = await pRetry(
     async () => {
@@ -117,8 +125,8 @@ export async function updateGist(data: Stats, gistId: string, token: string): Pr
     },
     { retries: 3 },
   )
-  if (!existingGist.data.files?.[`stats.json`])
-    throw new Error('Gist does not contain stats.json file')
+  if (!existingGist.data.files?.[`github-stats.json`])
+    throw new Error('Gist does not contain github-stats.json file')
 
   const content = JSON.stringify(data, null, 2)
   const response = await pRetry(
@@ -126,7 +134,7 @@ export async function updateGist(data: Stats, gistId: string, token: string): Pr
       return await octokit.request('PATCH /gists/{gist_id}', {
         gist_id: gistId,
         files: {
-          'stats.json': {
+          'github-stats.json': {
             content,
           },
         },

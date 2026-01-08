@@ -1,5 +1,12 @@
 import type { CAC } from 'cac'
-import type { CommandOptions, GraphQLUser, Options, PullRequest, Stats, User } from './types'
+import type {
+  CommandOptions,
+  GitHubStats,
+  GraphQLUser,
+  Options,
+  PullRequest,
+  User,
+} from './types'
 import { writeFile } from 'node:fs/promises'
 import process from 'node:process'
 import * as p from '@clack/prompts'
@@ -9,12 +16,13 @@ import { join } from 'pathe'
 import { resolveConfig } from './config'
 import { NAME, VERSION } from './constants'
 import { getGraphQLStats, getPullRequests, getUser, updateGist } from './git'
+import { calculateRank } from './rank'
 
 try {
   const cli: CAC = cac(NAME)
 
   cli
-    .command('', 'export GitHub contributions and publish to a GitHub Gist')
+    .command('', 'Export GitHub stats and publish to a GitHub Gist')
     .option('--cwd <path>', 'Working directory')
     .option('--token <token>', 'GitHub token')
     .option('--api-version <version>', 'GitHub API version', { default: '2022-11-28' })
@@ -29,8 +37,9 @@ try {
 
       const user = await fetchUser(config)
       const contributions = await fetchContributions(user, config)
+
       const stats = await fetchStats(user, config)
-      const data: Stats = {
+      const data: Omit<GitHubStats, 'rank'> = {
         user,
         contributions,
         commits: stats.commits,
@@ -45,7 +54,18 @@ try {
         repositoryDiscussionComments: stats.repositoryDiscussionComments,
         repositories: stats.repositories,
       }
-      await generate(data, config)
+
+      const rank = calculateRank({
+        commits: data.commits.totalCommitContributions ?? 0,
+        prs: data.pullRequests.totalCount ?? 0,
+        issues: data.openIssues.totalCount + data.closedIssues.totalCount,
+        reviews: data.reviews.totalPullRequestReviewContributions ?? 0,
+        repos: data.repositories.totalCount,
+        stars: data.repositories.nodes.reduce((acc, repo) => acc + repo.stargazers.totalCount, 0),
+        followers: data.followers.totalCount ?? 0,
+      })
+
+      await generate({ ...data, rank }, config)
     })
 
   cli.help()
@@ -81,8 +101,8 @@ async function fetchContributions(user: User, options: Options): Promise<PullReq
   return data
 }
 
-async function generate(data: Stats, options: Options) {
-  const filepath = join(options.cwd, 'stats.json')
+async function generate(data: GitHubStats, options: Options) {
+  const filepath = join(options.cwd, 'github-stats.json')
   await writeFile(filepath, JSON.stringify(data, null, 2))
 
   if (!options.gistId) {

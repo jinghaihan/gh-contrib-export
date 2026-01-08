@@ -19,18 +19,6 @@ export interface CommandOptions {
    */
   baseUrl?: string
   /**
-   * Whether to include merged pull requests
-   */
-  mergedPullRequests?: boolean
-  /**
-   * Whether to include discussions
-   */
-  discussions?: boolean
-  /**
-   * Whether to include discussions answers
-   */
-  discussionsAnswers?: boolean
-  /**
    * GitHub Gist ID
    */
   gistId?: string
@@ -59,20 +47,21 @@ export interface PullRequest {
   stars: number
 }
 
-export interface Stats {
+export interface GitHubStats {
   user: User
   contributions: PullRequest[]
   commits: ContributionsCollection
   reviews: ContributionsCollection
   repositoriesContributedTo: RepositoriesContributedTo
   pullRequests: PullRequestsData
-  mergedPullRequests?: PullRequestsData
+  mergedPullRequests: PullRequestsData
   openIssues: IssuesData
   closedIssues: IssuesData
   followers: FollowersData
-  repositoryDiscussions?: RepositoryDiscussionsData
-  repositoryDiscussionComments?: RepositoryDiscussionCommentsData
+  repositoryDiscussions: RepositoryDiscussionsData
+  repositoryDiscussionComments: RepositoryDiscussionCommentsData
   repositories: RepositoriesData
+  rank: RankResult
 }
 
 export interface GraphQLStatsResponse {
@@ -86,12 +75,12 @@ export interface GraphQLUser {
   reviews: ContributionsCollection
   repositoriesContributedTo: RepositoriesContributedTo
   pullRequests: PullRequestsData
-  mergedPullRequests?: PullRequestsData
+  mergedPullRequests: PullRequestsData
   openIssues: IssuesData
   closedIssues: IssuesData
   followers: FollowersData
-  repositoryDiscussions?: RepositoryDiscussionsData
-  repositoryDiscussionComments?: RepositoryDiscussionCommentsData
+  repositoryDiscussions: RepositoryDiscussionsData
+  repositoryDiscussionComments: RepositoryDiscussionCommentsData
   repositories: RepositoriesData
 }
 
@@ -136,4 +125,19 @@ export interface Repository {
 
 export interface StargazersData {
   totalCount: number
+}
+
+export interface RankParams {
+  commits: number
+  prs: number
+  issues: number
+  reviews: number
+  repos: number
+  stars: number
+  followers: number
+}
+
+export interface RankResult {
+  level: string
+  percentile: number
 }

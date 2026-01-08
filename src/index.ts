@@ -1,7 +1,2 @@
-import type { CommandOptions } from './types'
-
+export * from './rank'
 export * from './types'
-
-export function defineConfig(config: Partial<CommandOptions>) {
-  return config
-}

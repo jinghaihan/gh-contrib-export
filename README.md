@@ -1,10 +1,10 @@
-# GitHub Contributions Export
+# GitHub Statskit
 
 [![npm version][npm-version-src]][npm-version-href]
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-A CLI tool to export your GitHub contributions (Pull Requests) and publish to a GitHub Gist. Automatically sync your contribution data to a Gist for easy sharing and tracking.
+A CLI tool to export your GitHub stats and publish to a GitHub Gist. Automatically sync your contribution data to a Gist for easy sharing and tracking.
 
 <p align='center'>
 <img src='./assets/help.png' />
@@ -14,27 +14,27 @@ A CLI tool to export your GitHub contributions (Pull Requests) and publish to a 
 
 ### Local usage
 
-Run the tool locally to export your contributions:
+Run the tool locally to export your stats:
 
 ```bash
 export GH_PAT=your_github_token
 
 # Export to local file
-npx gh-contrib-export
+npx gh-statskit
 
-# Export and update Gist
-npx gh-contrib-export --gist-id id
+# Update to Gist
+npx gh-statskit --gist-id id
 ```
 
 ### GitHub CI usage
 
 > [!IMPORTANT]
-> Your Gist must already exist and contain a file named `contributions.json`. The tool will update this file with your latest contributions. If the file doesn't exist, the tool will throw an error.
+> Your Gist must already exist and contain a file named `github-stats.json`. The tool will update this file with your latest stats. If the file doesn't exist, the tool will throw an error.
 
-**Set up GitHub Actions** to automatically sync your contributions on a schedule:
+**Set up GitHub Actions** to automatically sync your stats on a schedule:
 
 ```yaml
-name: Upload Contributions
+name: Upload GitHub Stats
 
 on:
   push:
@@ -56,8 +56,8 @@ jobs:
         with:
           node-version: lts/*
 
-      - name: Export and Update Gist
-        run: npx gh-contrib-export
+      - name: Update to Gist
+        run: npx gh-statskit
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
           GIST_ID: ${{ secrets.GIST_ID }}
@@ -66,7 +66,7 @@ jobs:
 **Configure secrets in your repository**:
    - Go to your repository Settings > Secrets and variables > Actions
    - Add `GH_PAT` as a repository secret (your GitHub Personal Access Token)
-   - Add `GIST_ID` as a repository secret (the ID of your Gist containing `contributions.json`)
+   - Add `GIST_ID` as a repository secret (the ID of your Gist containing `github-stats.json`)
 
 ## Credits
 
@@ -81,13 +81,13 @@ This project is inspired by:
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/gh-contrib-export?style=flat&colorA=080f12&colorB=1fa669
-[npm-version-href]: https://npmjs.com/package/gh-contrib-export
-[npm-downloads-src]: https://img.shields.io/npm/dm/gh-contrib-export?style=flat&colorA=080f12&colorB=1fa669
-[npm-downloads-href]: https://npmjs.com/package/gh-contrib-export
-[bundle-src]: https://img.shields.io/bundlephobia/minzip/gh-contrib-export?style=flat&colorA=080f12&colorB=1fa669&label=minzip
-[bundle-href]: https://bundlephobia.com/result?p=gh-contrib-export
+[npm-version-src]: https://img.shields.io/npm/v/gh-statskit?style=flat&colorA=080f12&colorB=1fa669
+[npm-version-href]: https://npmjs.com/package/gh-statskit
+[npm-downloads-src]: https://img.shields.io/npm/dm/gh-statskit?style=flat&colorA=080f12&colorB=1fa669
+[npm-downloads-href]: https://npmjs.com/package/gh-statskit
+[bundle-src]: https://img.shields.io/bundlephobia/minzip/gh-statskit?style=flat&colorA=080f12&colorB=1fa669&label=minzip
+[bundle-href]: https://bundlephobia.com/result?p=gh-statskit
 [license-src]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat&colorA=080f12&colorB=1fa669
-[license-href]: https://github.com/jinghaihan/gh-contrib-export/LICENSE
+[license-href]: https://github.com/jinghaihan/gh-statskit/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
-[jsdocs-href]: https://www.jsdocs.io/package/gh-contrib-export
+[jsdocs-href]: https://www.jsdocs.io/package/gh-statskit

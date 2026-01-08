@@ -7,7 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "gh-contrib-export": ["./src/index.ts"]
+      "gh-statskit": ["./src/index.ts"]
     },
     "resolveJsonModule": true,
     "strict": true,
