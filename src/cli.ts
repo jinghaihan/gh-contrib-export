@@ -2,10 +2,9 @@ import type { CAC } from 'cac'
 import type {
   CommandOptions,
   GitHubStats,
-  GraphQLUser,
+  GitHubUser,
   Options,
   PullRequest,
-  User,
 } from './types'
 import { writeFile } from 'node:fs/promises'
 import process from 'node:process'
@@ -36,36 +35,21 @@ try {
       const config = await resolveConfig(options)
 
       const user = await fetchUser(config)
-      const contributions = await fetchContributions(user, config)
+      const pullRequests = await fetchPullRequests(user, config)
 
-      const stats = await fetchStats(user, config)
-      const data: Omit<GitHubStats, 'rank'> = {
-        user,
-        contributions,
-        commits: stats.commits,
-        reviews: stats.reviews,
-        repositoriesContributedTo: stats.repositoriesContributedTo,
-        pullRequests: stats.pullRequests,
-        mergedPullRequests: stats.mergedPullRequests,
-        openIssues: stats.openIssues,
-        closedIssues: stats.closedIssues,
-        followers: stats.followers,
-        repositoryDiscussions: stats.repositoryDiscussions,
-        repositoryDiscussionComments: stats.repositoryDiscussionComments,
-        repositories: stats.repositories,
-      }
+      const stats = await fetchStats(user, pullRequests, config)
 
       const rank = calculateRank({
-        commits: data.commits.totalCommitContributions ?? 0,
-        prs: data.pullRequests.totalCount ?? 0,
-        issues: data.openIssues.totalCount + data.closedIssues.totalCount,
-        reviews: data.reviews.totalPullRequestReviewContributions ?? 0,
-        repos: data.repositories.totalCount,
-        stars: data.repositories.nodes.reduce((acc, repo) => acc + repo.stargazers.totalCount, 0),
-        followers: data.followers.totalCount ?? 0,
+        commits: stats.commits,
+        prs: stats.pullRequest.totalCount,
+        issues: stats.issues.totalCount,
+        reviews: stats.reviews,
+        repos: stats.repositories.totalCount,
+        stars: stats.repositories.totalStargazers,
+        followers: stats.followers,
       })
 
-      await generate({ ...data, rank }, config)
+      await generate({ ...stats, rank }, config)
     })
 
   cli.help()
@@ -77,7 +61,7 @@ catch (error) {
   process.exit(1)
 }
 
-async function fetchUser(options: Options): Promise<User> {
+async function fetchUser(options: Options): Promise<GitHubUser> {
   const spinner = p.spinner()
   spinner.start('getting user information')
   const user = await getUser(options)
@@ -85,20 +69,46 @@ async function fetchUser(options: Options): Promise<User> {
   return user
 }
 
-async function fetchStats(user: User, options: Options): Promise<GraphQLUser> {
-  const spinner = p.spinner()
-  spinner.start('getting stats')
-  const stats = await getGraphQLStats(user, options)
-  spinner.stop('stats retrieved')
-  return stats
-}
-
-async function fetchContributions(user: User, options: Options): Promise<PullRequest[]> {
+async function fetchPullRequests(user: GitHubUser, options: Options): Promise<PullRequest[]> {
   const spinner = p.spinner()
   spinner.start('getting pull requests')
   const data = await getPullRequests(user.username, options)
   spinner.stop(`pull requests retrieved: ${data.length}`)
   return data
+}
+
+async function fetchStats(user: GitHubUser, pullRequests: PullRequest[], options: Options): Promise<Omit<GitHubStats, 'rank'>> {
+  const spinner = p.spinner()
+  spinner.start('getting stats')
+  const response = await getGraphQLStats(user, options)
+  const stats: Omit<GitHubStats, 'rank'> = {
+    user,
+    commits: response.commits.totalCommitContributions ?? 0,
+    reviews: response.reviews.totalPullRequestReviewContributions ?? 0,
+    repositoriesContributedTo: response.repositoriesContributedTo.totalCount,
+    pullRequest: {
+      totalCount: response.pullRequests.totalCount,
+      mergedCount: response.mergedPullRequests.totalCount,
+      data: pullRequests,
+    },
+    issues: {
+      totalCount: response.openIssues.totalCount + response.closedIssues.totalCount,
+      openCount: response.openIssues.totalCount,
+      closedCount: response.closedIssues.totalCount,
+    },
+    followers: response.followers.totalCount,
+    discussions: {
+      totalCount: response.repositoryDiscussions.totalCount,
+      commentsCount: response.repositoryDiscussionComments.totalCount,
+    },
+    repositories: {
+      totalCount: response.repositories.totalCount,
+      totalStargazers: response.repositories.nodes.reduce((acc, repo) => acc + repo.stargazers.totalCount, 0),
+      data: response.repositories.nodes.map(node => ({ name: node.name, stargazers: node.stargazers.totalCount })),
+    },
+  }
+  spinner.stop('stats retrieved')
+  return stats
 }
 
 async function generate(data: GitHubStats, options: Options) {

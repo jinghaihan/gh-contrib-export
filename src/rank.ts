@@ -1,4 +1,4 @@
-import type { RankParams, RankResult } from './types'
+import type { RankParams, RankStats } from './types'
 
 /**
  * Calculates the exponential cdf.
@@ -26,7 +26,7 @@ export function calculateRank({
   repos: _repos, // unused
   stars,
   followers,
-}: RankParams): RankResult {
+}: RankParams): RankStats {
   const COMMITS_MEDIAN = 250
   const COMMITS_WEIGHT = 2
   const PRS_MEDIAN = 50

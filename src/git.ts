@@ -1,10 +1,10 @@
 import type {
   GitHubStats,
-  GraphQLStatsResponse,
+  GitHubUser,
+  GraphQLResponse,
   GraphQLUser,
   Options,
   PullRequest,
-  User,
 } from './types'
 import { execa } from 'execa'
 import pRetry from 'p-retry'
@@ -38,7 +38,7 @@ export async function getRepo(owner: string, name: string, token: string) {
   return data
 }
 
-export async function getUser(options: Options): Promise<User> {
+export async function getUser(options: Options): Promise<GitHubUser> {
   const octokit = getOctoKit(options.token)
   const response = await pRetry(
     async () => {
@@ -94,7 +94,7 @@ export async function getPullRequests(username: string, options: Options): Promi
   return prs
 }
 
-export async function getGraphQLStats(user: User, options: Options): Promise<GraphQLUser> {
+export async function getGraphQLStats(user: GitHubUser, options: Options): Promise<GraphQLUser> {
   const octokit = getOctoKit(options.token)
 
   const variables = {
@@ -111,7 +111,7 @@ export async function getGraphQLStats(user: User, options: Options): Promise<Gra
     },
     { retries: 3 },
   )
-  const { user: graphqlUser } = response as GraphQLStatsResponse
+  const { user: graphqlUser } = response as GraphQLResponse
   return graphqlUser
 }
 
